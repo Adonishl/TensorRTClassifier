@@ -1,0 +1,5 @@
+--model_file=../../../models/resnet50/ResNet-50-deploy.prototxt
+--pretrained_file=../../../models/resnet50/ResNet-50-model.caffemodel
+--output_blob_file=../../../models/resnet50/output_blob.txt
+--batch_size=8
+--output_path=../../../models/resnet50/resnet50engine.rt

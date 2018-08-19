@@ -1,0 +1,28 @@
+FROM nvidia/cuda:8.0-cudnn7-devel-ubuntu16.04
+
+# Forbid apt-get update from nvidia
+RUN mv /etc/apt/sources.list.d/ /etc/apt/sources.list.dbak
+
+# Common package
+RUN apt-get clean && apt-get update  && \
+    apt-get install -y \
+        vim git tree \
+        build-essential cmake pkg-config autoconf libtool automake \
+        python python-tk python-pip \
+        wget curl ca-certificates unzip \
+        iputils-ping net-tools \
+        libopencv-dev
+
+ENV LD_LIBRARY_PATH=/usr/local/lib:${LD_LIBRARY_PATH}
+
+# Install TensorRT
+COPY ./tarball/nvidia/TensorRT-4.0.1.6.Ubuntu-16.04.4.x86_64-gnu.cuda-8.0.cudnn7.1.tar.gz /tmp/nvidia/
+RUN cd /tmp/nvidia/ && tar -zxvf TensorRT-4.0.1.6.Ubuntu-16.04.4.x86_64-gnu.cuda-8.0.cudnn7.1.tar.gz && \
+    mv TensorRT-4.0.1.6/lib/* /usr/local/lib && \
+    mkdir /root/tensorrt/ && mv TensorRT-4.0.1.6/include /root/tensorrt/trt_include && rm -rf /tmp/nvidia
+
+# Install gflags
+COPY tarball/google/gflags-2.2.0.tar.gz /tmp/gflags/
+RUN cd /tmp/gflags && tar -zxf gflags-2.2.0.tar.gz && cd gflags-2.2.0 && \
+    cmake . -DBUILD_SHARED_LIBS=ON && make -j && make install && ldconfig && \
+    rm -rf /tmp/gflags/
